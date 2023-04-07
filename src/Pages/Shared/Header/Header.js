@@ -1,15 +1,29 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import './Header.css';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
+import { Link } from 'react-router-dom';
 import LeftSideNav from '../LeftSideNav/LeftSideNav';
+import { AuthContext } from '../../../contexts/AuthProvider/AuthProvider';
+import { Image } from 'react-bootstrap';
+import { FaUser } from 'react-icons/fa';
+import Button from 'react-bootstrap/Button';
 
 const Header = () => {
+
+    const { user, logOut } = useContext(AuthContext);
+
+    const handleLogOut = () => {
+        logOut()
+            .then(() => { })
+            .catch((error) => console.error(error))
+    }
     return (
         <Navbar collapseOnSelect className='mb-4' expand="lg" bg="dark" variant="dark">
             <Container>
-                <Navbar.Brand href="#home">Dragon News</Navbar.Brand>
+                <Navbar.Brand><Link className='dragon-news-header' to='/'>Dragon News</Link></Navbar.Brand>
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse id="responsive-navbar-nav">
                     <Nav className="me-auto">
@@ -28,10 +42,32 @@ const Header = () => {
                         </NavDropdown>
                     </Nav>
                     <Nav>
-                        <Nav.Link href="#deets">More deets</Nav.Link>
-                        <Nav.Link eventKey={2} href="#memes">
-                            Dank memes
+                        <Nav.Link href="#deets">
+                            {
+                                user?.uid ?
+                                    <>
+                                        <span className='mx-2'>{user.displayName}</span>
+                                        <Button onClick={handleLogOut} variant="info">Log Out</Button>
+                                    </>
+                                    :
+                                    <>
+                                        <Link className='mx-3' to='/login'>LogIn</Link>
+                                        <Link to='/register'>Register</Link>
+                                    </>
+                            }
                         </Nav.Link>
+                        <Link to='/profile'>
+                            {user?.photoURL ?
+                                <Image
+                                    src={user?.photoURL}
+                                    roundedCircle
+                                    style={{ height: '30px' }}
+                                >
+                                </Image>
+                                :
+                                <FaUser></FaUser>
+                            }
+                        </Link>
                     </Nav>
                     <div className='d-lg-none'>
                         <LeftSideNav></LeftSideNav>
